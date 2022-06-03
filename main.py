@@ -1,10 +1,13 @@
-# gunicorn -w 1 -b 0.0.0.0:5000 main:app --reload
+# gunicorn -w 1 -b 0.0.0.0:8080 main:app --reload
 
-from fileinput import filename
 import logging
 import sys
 import os
-from flask import Flask, render_template, request, Request
+import socket
+import json
+from threading import Thread
+from time import sleep
+from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
 from lookup import LookUp
@@ -18,6 +21,7 @@ app.logger.addHandler(handler)
 
 lookup = LookUp()
 
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
@@ -28,6 +32,7 @@ def upload():
         return 'File Uploaded'
     return render_template('upload.html')
 
+
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
     if request.method == 'POST':
@@ -35,6 +40,7 @@ def connect():
         lookup.add_neighbour(ip)
         return 'Neighbour Added'
     return render_template('connect.html')
+
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -44,13 +50,25 @@ def search():
         return ip
     return render_template('search.html')
 
-@app.post('/find')
-async def collect_metrics(request: Request):
-    request = await request.json()
-    src = request['src']
-    filename = request['filename']
-    dst = lookup.find_file(filename, src)
-    return dst
+
+def server_socket():
+    s = socket.socket()
+    s.bind(('', 12345))
+    s.listen(5)
+    while True:
+        c, addr = s.accept()
+        msg = c.recv(1024).decode()
+        msg = json.loads(msg)
+        src = msg['src']
+        filename = msg['filename']
+        ttl = msg['ttl'] - 1
+        ip = lookup.find_file(filename, src, ttl)
+        c.send(ip.encode())
+        c.close()
+
+
+server_thread = Thread(target=server_socket)
+server_thread.start()
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
+    app.run(host='0.0.0.0', debug=True)
