@@ -9,7 +9,6 @@ class LookUp:
         self.ip = os.environ.get('MY_IP')
         self.table = list()
         self.neighbours = list()
-        self.client_socket = socket.socket()
 
     def add_file(self, filename, ip=None):
         if ip is None:
@@ -24,21 +23,40 @@ class LookUp:
             src = self.ip
         for row in self.table:
             if row[0] == filename:
-                print("kir")
                 return row[1]
         for ip in self.neighbours:
             if ip == src:
                 continue
-            self.client_socket.connect((ip, 12345))
+            s = socket.socket()
+            s.connect((ip, 12345))
             data = {
+                'type': 'find',
                 'src': src,
                 'filename': filename,
                 'ttl': ttl
             }
             encode_data = json.dumps(data).encode('utf-8')
-            self.client_socket.send(encode_data)
-            res = self.client_socket.recv(1024).decode()
-            self.client_socket.close()
+            s.send(encode_data)
+            res = s.recv(1024).decode()
+            s.close()
             if res != '':
                 return res
         return ''
+
+    def get_file(self, filename, ip):
+        s = socket.socket()
+        s.connect((ip, 12345))
+        data = {
+            'type': 'get',
+            'filename': filename
+        }
+        encode_data = json.dumps(data).encode('utf-8')
+        s.send(encode_data)
+        with open(os.path.join('files', filename), 'wb') as f:
+            while True:
+                data = s.recv(1024)
+                if not data:
+                    f.close()
+                    break
+                f.write(data)
+        s.close()

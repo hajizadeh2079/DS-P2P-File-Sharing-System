@@ -6,7 +6,6 @@ import os
 import socket
 import json
 from threading import Thread
-from time import sleep
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
 
@@ -47,7 +46,10 @@ def search():
     if request.method == 'POST':
         filename = request.form['filename']
         ip = lookup.find_file(filename)
-        return ip
+        if ip != '':
+            lookup.get_file(filename, ip)
+            return 'File Downoaded'
+        return 'File Not Found'
     return render_template('search.html')
 
 
@@ -59,11 +61,23 @@ def server_socket():
         c, addr = s.accept()
         msg = c.recv(1024).decode()
         msg = json.loads(msg)
-        src = msg['src']
-        filename = msg['filename']
-        ttl = msg['ttl'] - 1
-        ip = lookup.find_file(filename, src, ttl)
-        c.send(ip.encode())
+        if msg['type'] == 'find':
+            src = msg['src']
+            filename = msg['filename']
+            ttl = msg['ttl'] - 1
+            ip = lookup.find_file(filename, src, ttl)
+            c.send(ip.encode())
+        if msg['type'] == 'get':
+            filename = msg['filename']
+            f = open(os.path.join(app.config['UPLOAD_FOLDER'], filename), 'rb')
+            while True:
+                l = f.read(1024)
+                while (l):
+                    c.send(l)
+                    l = f.read(1024)
+                if not l:
+                    f.close()
+                    break
         c.close()
 
 
