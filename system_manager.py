@@ -1,4 +1,5 @@
 import os
+from fuzzywuzzy import fuzz
 
 from my_socket import ClientSocket
 from config import Config
@@ -26,8 +27,8 @@ class SystemManager:
         if src is None:
             src = self.addr
         for row in self.table:
-            if row[0] == filename:
-                return row[1]
+            if fuzz.token_set_ratio(filename, row[0]) > Config.similarity_th:
+                return {'filename': row[0], 'addr': row[1]}
         if ttl >= 0:
             for addr in self.neighbours:
                 if addr == src:
@@ -44,8 +45,8 @@ class SystemManager:
                 s.close()
                 if msg['addr'] != '':
                     self.add_file(filename, msg['addr'])
-                    return msg['addr']
-        return ''
+                    return msg
+        return {'filename': '', 'addr': ''}
 
     def get_file(self, filename, addr):
         s = ClientSocket(addr)

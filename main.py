@@ -65,13 +65,9 @@ def download():
 def search():
     if request.method == 'POST':
         filename = request.form['filename']
-        addr = system_manager.find_file(filename)
-        if addr != '':
-            messages = json.dumps({
-                'addr': addr,
-                'filename': filename
-            })
-            return redirect(url_for('.download', messages=messages))
+        msg = system_manager.find_file(filename)
+        if msg['addr'] != '':
+            return redirect(url_for('.download', messages=json.dumps({msg})))
         return render_template('search_failed.html')
     return render_template('search.html')
 
@@ -86,10 +82,7 @@ def server_socket():
             src = msg['src']
             filename = msg['filename']
             ttl = msg['ttl'] - 1
-            addr = system_manager.find_file(filename, src, ttl)
-            msg = {
-                'addr': addr
-            }
+            msg = system_manager.find_file(filename, src, ttl)
             s.send_msg(msg)
         elif msg['type'] == 'get':
             filename = msg['filename']
@@ -100,4 +93,4 @@ def server_socket():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
 
-# TODO exit mechanism + similarity maching
+# TODO exit mechanism

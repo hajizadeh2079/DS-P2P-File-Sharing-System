@@ -7,3 +7,4 @@ class Config:
     upload_folder = 'files'
     addr = os.environ.get('MY_ADDR')
     channel = 1
+    similarity_th = 70
