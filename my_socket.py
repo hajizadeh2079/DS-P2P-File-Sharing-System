@@ -42,7 +42,7 @@ class ServerSocket:
         if Config.connection_type == 'bluetooth':
             self.s = socket.socket(socket.AF_BLUETOOTH,
                                    socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        self.s.bind((Config.my_addr, Config.port))
+        self.s.bind((Config.addr, Config.port))
         self.s.listen(5)
 
     def accept(self):
