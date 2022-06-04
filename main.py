@@ -1,11 +1,11 @@
 # gunicorn -b 0.0.0.0:8080 main:app --reload
 
-from audioop import add
 import logging
 import sys
 import os
+import json
 from threading import Thread
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for, redirect
 from werkzeug.utils import secure_filename
 
 from system_manager import SystemManager
@@ -37,7 +37,7 @@ def upload():
         filename = secure_filename(file.filename)
         file.save(os.path.join(Config.upload_folder, filename))
         system_manager.add_file(filename)
-        return 'File Uploaded'
+        return render_template('upload_success.html')
     return render_template('upload.html')
 
 
@@ -46,8 +46,19 @@ def connect():
     if request.method == 'POST':
         addr = request.form['addr']
         system_manager.add_neighbour(addr)
-        return 'Neighbour Added'
+        return render_template('connect_success.html')
     return render_template('connect.html')
+
+
+@app.route('/download', methods=['GET', 'POST'])
+def download():
+    if request.method == 'POST':
+        filename = request.form['filename']
+        addr = request.form['addr']
+        system_manager.get_file(filename, addr)
+        return render_template('download_success.html')
+    messages = json.loads(request.args['messages'])
+    return render_template('download.html', filename=messages['filename'], addr=messages['addr'])
 
 
 @app.route('/search', methods=['GET', 'POST'])
@@ -56,10 +67,12 @@ def search():
         filename = request.form['filename']
         addr = system_manager.find_file(filename)
         if addr != '':
-            system_manager.get_file(filename, addr)
-            app.logger.error(filename, addr)
-            return 'File Downoaded'
-        return 'File Not Found'
+            messages = json.dumps({
+                'addr': addr,
+                'filename': filename
+            })
+            return redirect(url_for('.download', messages=messages))
+        return render_template('search_failed.html')
     return render_template('search.html')
 
 
@@ -87,4 +100,4 @@ def server_socket():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
 
-# TODO exit mechanism + seacrh/download + similarity maching
+# TODO exit mechanism + similarity maching

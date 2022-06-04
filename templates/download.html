@@ -1,0 +1,9 @@
+<!doctype html>
+<title>Download</title>
+<a href="/">Home</a><br><br>
+<h1>Download {{filename}} from {{addr}}</h1>
+<form method=post enctype=multipart/form-data>
+    <input type=hidden name=filename value={{filename}}>
+    <input type=hidden name=addr value={{addr}}>
+    <input type=submit value=Download>
+</form>
