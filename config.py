@@ -6,3 +6,4 @@ class Config:
     port = 12345
     upload_folder = 'files'
     addr = os.environ.get('MY_ADDR')
+    channel = 1

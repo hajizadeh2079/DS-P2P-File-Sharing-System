@@ -1,5 +1,3 @@
-import os
-
 from my_socket import ClientSocket
 from config import Config
 

@@ -8,10 +8,11 @@ class ClientSocket:
     def __init__(self, addr):
         if Config.connection_type == 'wifi':
             self.s = socket.socket()
+            self.s.connect(('', Config.port))
         if Config.connection_type == 'bluetooth':
             self.s = socket.socket(socket.AF_BLUETOOTH,
                                    socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        self.s.connect((addr, Config.port))
+            self.s.connect((addr, Config.channel))
 
     def send_msg(self, msg):
         encode_msg = json.dumps(msg).encode('utf-8')
@@ -39,10 +40,11 @@ class ServerSocket:
     def __init__(self):
         if Config.connection_type == 'wifi':
             self.s = socket.socket()
+            self.s.bind(('', Config.port))
         if Config.connection_type == 'bluetooth':
             self.s = socket.socket(socket.AF_BLUETOOTH,
                                    socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        self.s.bind((Config.addr, Config.port))
+            self.s.bind((Config.addr, Config.channel))
         self.s.listen(5)
 
     def accept(self):
