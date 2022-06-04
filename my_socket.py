@@ -25,7 +25,7 @@ class ClientSocket:
     def recv_file(self, filename):
         with open(os.path.join(Config.upload_folder, filename), 'wb') as f:
             while True:
-                data = self.recv(1024)
+                data = self.s.recv(1024)
                 if not data:
                     f.close()
                     break
@@ -42,7 +42,7 @@ class ServerSocket:
         if Config.connection_type == 'bluetooth':
             self.s = socket.socket(socket.AF_BLUETOOTH,
                                    socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        self.s.bind(('', Config.port))
+        self.s.bind((Config.my_addr, Config.port))
         self.s.listen(5)
 
     def accept(self):

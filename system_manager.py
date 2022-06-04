@@ -1,12 +1,13 @@
 import os
 
 from my_socket import ClientSocket
+from config import Config
 
 
 class SystemManager:
 
     def __init__(self):
-        self.addr = os.environ.get('MY_ADDR')
+        self.addr = Config.addr
         self.table = list()
         self.neighbours = list()
 

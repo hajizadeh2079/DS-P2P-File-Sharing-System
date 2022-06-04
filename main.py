@@ -74,8 +74,8 @@ def server_socket():
             msg = {
                 'addr': addr
             }
-            s.send_msg()
-        if msg['type'] == 'get':
+            s.send_msg(msg)
+        elif msg['type'] == 'get':
             filename = msg['filename']
             s.send_file(filename)
         s.close()
