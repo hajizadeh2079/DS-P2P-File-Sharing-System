@@ -1,5 +1,6 @@
 # gunicorn -b 0.0.0.0:8080 main:app --reload
 
+from audioop import add
 import logging
 import sys
 import os
@@ -56,6 +57,7 @@ def search():
         addr = system_manager.find_file(filename)
         if addr != '':
             system_manager.get_file(filename, addr)
+            app.logger.error(filename, addr)
             return 'File Downoaded'
         return 'File Not Found'
     return render_template('search.html')
@@ -66,6 +68,7 @@ def server_socket():
     while True:
         s.accept()
         msg = s.recv_msg()
+        app.logger.error(msg)
         if msg['type'] == 'find':
             src = msg['src']
             filename = msg['filename']
@@ -84,4 +87,4 @@ def server_socket():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
 
-# TODO exit mechanism + ls files + seacrh/download + similarity maching
+# TODO exit mechanism + seacrh/download + similarity maching

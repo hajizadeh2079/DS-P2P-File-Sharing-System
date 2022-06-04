@@ -1,3 +1,5 @@
+import os
+
 from my_socket import ClientSocket
 from config import Config
 
@@ -7,6 +9,9 @@ class SystemManager:
     def __init__(self):
         self.addr = Config.addr
         self.table = list()
+        filenames = os.listdir(Config.upload_folder)
+        for filename in filenames:
+            self.table.append([filename, self.addr])
         self.neighbours = list()
 
     def add_file(self, filename, addr=None):
