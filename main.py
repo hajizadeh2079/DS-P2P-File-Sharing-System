@@ -67,7 +67,7 @@ def search():
         filename = request.form['filename']
         msg = system_manager.find_file(filename)
         if msg['addr'] != '':
-            return redirect(url_for('.download', messages=json.dumps({msg})))
+            return redirect(url_for('.download', messages=json.dumps(msg)))
         return render_template('search_failed.html')
     return render_template('search.html')
 
