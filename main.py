@@ -84,4 +84,4 @@ def server_socket():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
 
-# TODO ttl + cache + cleaning + exit mechanism + ls files
+# TODO cache + exit mechanism + ls files

@@ -23,21 +23,22 @@ class SystemManager:
         for row in self.table:
             if row[0] == filename:
                 return row[1]
-        for addr in self.neighbours:
-            if addr == src:
-                continue
-            s = ClientSocket(addr)
-            msg = {
-                'type': 'find',
-                'src': src,
-                'filename': filename,
-                'ttl': ttl
-            }
-            s.send_msg(msg)
-            msg = s.recv_msg()
-            s.close()
-            if msg['addr'] != '':
-                return msg['addr']
+        if ttl >= 0:
+            for addr in self.neighbours:
+                if addr == src:
+                    continue
+                s = ClientSocket(addr)
+                msg = {
+                    'type': 'find',
+                    'src': src,
+                    'filename': filename,
+                    'ttl': ttl
+                }
+                s.send_msg(msg)
+                msg = s.recv_msg()
+                s.close()
+                if msg['addr'] != '':
+                    return msg['addr']
         return ''
 
     def get_file(self, filename, addr):
