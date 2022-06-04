@@ -1,4 +1,4 @@
-# gunicorn -w 1 -b 0.0.0.0:8080 main:app --reload
+# gunicorn -b 0.0.0.0:8080 main:app --reload
 
 import logging
 import sys
@@ -84,4 +84,4 @@ def server_socket():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
 
-# TODO cache + exit mechanism + ls files
+# TODO exit mechanism + ls files + seacrh/download + similarity maching

@@ -38,6 +38,7 @@ class SystemManager:
                 msg = s.recv_msg()
                 s.close()
                 if msg['addr'] != '':
+                    self.add_file(filename, msg['addr'])
                     return msg['addr']
         return ''
 

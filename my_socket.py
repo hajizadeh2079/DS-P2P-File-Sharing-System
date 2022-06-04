@@ -8,7 +8,7 @@ class ClientSocket:
     def __init__(self, addr):
         if Config.connection_type == 'wifi':
             self.s = socket.socket()
-            self.s.connect(('', Config.port))
+            self.s.connect((addr, Config.port))
         if Config.connection_type == 'bluetooth':
             self.s = socket.socket(socket.AF_BLUETOOTH,
                                    socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
