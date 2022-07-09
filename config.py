@@ -8,3 +8,5 @@ class Config:
     addr = os.environ.get('MY_ADDR')
     channel = 1
     similarity_th = 70
+    chunk_size = 1024
+    health_delay = 60

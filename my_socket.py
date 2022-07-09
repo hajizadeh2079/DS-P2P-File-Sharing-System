@@ -19,14 +19,14 @@ class ClientSocket:
         self.s.send(encode_msg)
 
     def recv_msg(self):
-        msg = self.s.recv(1024).decode()
+        msg = self.s.recv(Config.chunk_size).decode()
         msg = json.loads(msg)
         return msg
 
     def recv_file(self, filename):
         with open(os.path.join(Config.upload_folder, filename), 'wb') as f:
             while True:
-                data = self.s.recv(1024)
+                data = self.s.recv(Config.chunk_size)
                 if not data:
                     f.close()
                     break
@@ -69,17 +69,17 @@ class ServerSocket:
         self.c.send(encode_msg)
 
     def recv_msg(self):
-        msg = self.c.recv(1024).decode()
+        msg = self.c.recv(Config.chunk_size).decode()
         msg = json.loads(msg)
         return msg
 
     def send_file(self, filename):
         f = open(os.path.join(Config.upload_folder, filename), 'rb')
         while True:
-            l = f.read(1024)
+            l = f.read(Config.chunk_size)
             while (l):
                 self.c.send(l)
-                l = f.read(1024)
+                l = f.read(Config.chunk_size)
             if not l:
                 f.close()
                 break

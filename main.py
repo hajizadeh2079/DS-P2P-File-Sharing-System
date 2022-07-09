@@ -61,7 +61,8 @@ def download():
         start = time()
         system_manager.get_file(filename, addr)
         end = time()
-        size = os.path.getsize(os.path.join(Config.upload_folder, filename)) / 1000000
+        size = os.path.getsize(os.path.join(
+            Config.upload_folder, filename)) / 1000000
         download_speed = size / (end - start)
         return render_template('download_success.html', download_speed=download_speed)
     messages = json.loads(request.args['messages'])
@@ -100,14 +101,13 @@ def server_socket():
 def health_socket():
     while True:
         neighbours = system_manager.get_neighbours()
-        for i, neighbour in enumerate(neighbours):
+        for index, neighbour in enumerate(neighbours):
             if not ClientSocket.health_check(neighbour, Config.port):
-                del neighbours[i]
-                app.logger.error(f'{neighbour} was removed from neighbours')
-        sleep(60)
+                system_manager.delete_neighbours(index, neighbour)
+                app.logger.error(
+                    f'{neighbour} was removed from neighbours and cache')
+        sleep(Config.health_delay)
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
-
-# TODO exit mechanism

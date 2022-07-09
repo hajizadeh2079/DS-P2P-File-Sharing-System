@@ -26,6 +26,12 @@ class SystemManager:
     def get_neighbours(self):
         return self.neighbours
 
+    def delete_neighbours(self, index, neighbour):
+        del self.neighbours[index]
+        for i, row in enumerate(self.table):
+            if row[1] == neighbour:
+                del self.table[i]
+
     def find_file(self, filename, src=None, ttl=5):
         if src is None:
             src = self.addr
