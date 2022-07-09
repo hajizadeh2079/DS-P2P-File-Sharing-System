@@ -5,12 +5,13 @@ import sys
 import os
 import json
 from threading import Thread
+from time import sleep
 from flask import Flask, render_template, request, url_for, redirect
 from werkzeug.utils import secure_filename
 
 from system_manager import SystemManager
 from config import Config
-from my_socket import ServerSocket
+from my_socket import ClientSocket, ServerSocket
 
 
 app = Flask(__name__)
@@ -26,7 +27,9 @@ def home():
     if request.method == 'POST':
         Config.connection_type = request.form['connection_type']
         server_thread = Thread(target=server_socket)
+        health_thread = Thread(target=health_socket)
         server_thread.start()
+        health_thread.start()
     return render_template('home.html')
 
 
@@ -88,6 +91,16 @@ def server_socket():
             filename = msg['filename']
             s.send_file(filename)
         s.close()
+
+
+def health_socket():
+    while True:
+        neighbours = system_manager.get_neighbours()
+        for i, neighbour in enumerate(neighbours):
+            if not ClientSocket.health_check(neighbour, Config.port):
+                del neighbours[i]
+                app.logger.error(f'{neighbour} was removed from neighbours')
+        sleep(60)
 
 
 if __name__ == '__main__':

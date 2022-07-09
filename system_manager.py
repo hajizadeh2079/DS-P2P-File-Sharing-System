@@ -23,6 +23,9 @@ class SystemManager:
     def add_neighbour(self, addr):
         self.neighbours.append(addr)
 
+    def get_neighbours(self):
+        return self.neighbours
+
     def find_file(self, filename, src=None, ttl=5):
         if src is None:
             src = self.addr

@@ -35,6 +35,20 @@ class ClientSocket:
     def close(self):
         self.s.close()
 
+    @staticmethod
+    def health_check(addr, port):
+        if Config.connection_type == 'wifi':
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if Config.connection_type == 'bluetooth':
+            s = socket.socket(socket.AF_BLUETOOTH,
+                              socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        result = s.connect_ex((addr, port))
+        s.close()
+        if result == 0:
+            return True
+        else:
+            return False
+
 
 class ServerSocket:
     def __init__(self):
