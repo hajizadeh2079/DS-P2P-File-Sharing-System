@@ -5,7 +5,7 @@ import sys
 import os
 import json
 from threading import Thread
-from time import sleep
+from time import sleep, time
 from flask import Flask, render_template, request, url_for, redirect
 from werkzeug.utils import secure_filename
 
@@ -58,8 +58,12 @@ def download():
     if request.method == 'POST':
         filename = request.form['filename']
         addr = request.form['addr']
+        start = time()
         system_manager.get_file(filename, addr)
-        return render_template('download_success.html')
+        end = time()
+        size = os.path.getsize(os.path.join(Config.upload_folder, filename)) / 1000000
+        download_speed = size / (end - start)
+        return render_template('download_success.html', download_speed=download_speed)
     messages = json.loads(request.args['messages'])
     return render_template('download.html', filename=messages['filename'], addr=messages['addr'])
 
